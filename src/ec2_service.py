@@ -3,22 +3,32 @@ from src import ClientError, get_ec2_client
 # Inicializa o cliente EC2
 ec2 = get_ec2_client()
 
-def criar_instancia(nome):
+def criar_instancia():
     try:
+        # Inputs do usuário
+        nome = input("Digite o nome da instância: ").strip() or "MinhaInstancia"
+        imagem = input("Digite o ID da AMI (pressione Enter para padrão t3.micro): ").strip() or "ami-0c94855ba95c71c99"
+        tipo_maquina = input("Digite o tipo da instância (Ex: t2.micro, t3.micro) [padrão: t3.micro]: ").strip() or "t3.micro"
+        quantidade = input("Digite a quantidade de instâncias (padrão: 1): ").strip()
+        quantidade = int(quantidade) if quantidade.isdigit() and int(quantidade) > 0 else 1
+
+        # Criar instância EC2
         instancia = ec2.run_instances(
-            ImageId='ami-0c94855ba95c71c99',
-            MinCount=1,
-            MaxCount=1,
-            InstanceType='t3.micro',
+            ImageId=imagem,
+            MinCount=quantidade,
+            MaxCount=quantidade,
+            InstanceType=tipo_maquina,
             TagSpecifications=[{
                 'ResourceType': 'instance',
                 'Tags': [{'Key': 'Name', 'Value': nome}]
             }]
         )
-        print(f"Instância criada: {instancia['Instances'][0]['InstanceId']}")
+        # Imprime os IDs das instâncias criadas
+        for inst in instancia['Instances']:
+            print(f"Instância criada: {inst['InstanceId']}")
+
     except ClientError as e:
         print(f"Erro ao criar instância: {e}")
-
 
 def listar_instancias():
     try:
