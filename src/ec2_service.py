@@ -133,6 +133,14 @@ def hibernate(instance_id: str):
         tratar_erro_boto3(e, "hibernate")
 
 
+def terminar_instancia(instance_id: str):
+    try:
+        response = ec2.terminate_instances(InstanceIds=[instance_id])
+        print(f'Instância {instance_id} removida com sucesso!')
+        return response
+    except ClientError as e:
+        return tratar_erro_boto3(e, operacao="terminate")
+
 def tratar_erro_boto3(e: ClientError, operacao: str = None) -> str:
     error_code = e.response['Error']['Code']
 
@@ -152,6 +160,12 @@ def tratar_erro_boto3(e: ClientError, operacao: str = None) -> str:
     # Erro de ID de instância não encontrado
     elif error_code == "InvalidInstanceID.NotFound":
         return "Erro: ID da instância inválido."
+
+    # Erro de operação não permitida (ex: proteção contra terminação)
+    elif error_code == 'OperationNotPermitted':
+        if operacao == 'terminate':
+            return "Erro: Operação não permitida. A instância pode estar com a proteção contra terminação ativada."
+        return "Erro: Operação não permitida para o estado atual da instância."
 
     # Erros de permissão
     elif error_code in ['UnauthorizedOperation', 'AccessDenied']:
