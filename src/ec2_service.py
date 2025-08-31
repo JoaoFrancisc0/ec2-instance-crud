@@ -19,6 +19,44 @@ def criar_instancia(nome):
     except ClientError as e:
         print(f"Erro ao criar instância: {e}")
 
+
+def listar_instancias():
+    try:
+        response = ec2.describe_instances()
+        instancias_info = []
+        for reservation in response['Reservations']:
+            for instance in reservation['Instances']:
+                tags = 'N/A'
+                if 'Tags' in instance:
+                    tags = ', '.join([f"{tag['Key']}={tag['Value']}" for tag in instance['Tags']])
+
+                info = {
+                    'ID': instance['InstanceId'],
+                    'Status': instance['State']['Name'],
+                    'IP Público': instance.get('PublicIpAddress', 'N/A'),
+                    'Tags': tags
+                }
+                instancias_info.append(info)
+
+        if (instancias_info):
+            num_instancias = len(instancias_info)
+            if (num_instancias > 1):
+                print(f'{num_instancias} instâncias encontradas: ')
+                print('')
+            else:
+                print('1 instância encontrada: ')
+                print('')
+            for instancia in instancias_info:
+                print(f'ID: {instancia['ID']}')
+                print(f'Status: {instancia['Status']}')
+                print(f'IP público: {instancia['IP Público']}')
+                print(f'Tags: {instancia['Tags']}')
+                print('')
+        else:
+            print('Nenhuma instância encontrada!')
+    except ClientError as e:
+        print(tratar_erro_boto3(e, operacao='list'))
+
 # ============================== UPDATE ============================== #
 
 def add_tag(instance_id: str, key: str, value: str):
@@ -94,10 +132,11 @@ def hibernate(instance_id: str):
     except ClientError as e:
         tratar_erro_boto3(e, "hibernate")
 
-        
+
 def tratar_erro_boto3(e: ClientError, operacao: str = None) -> str:
     error_code = e.response['Error']['Code']
 
+    # Erros de estado da instância
     if error_code in ['IncorrectInstanceState', 'IncorrectState']:
         if operacao in ['reboot', 'stop', 'hibernate']:
             return "Erro: A instância deve estar **rodando** para esta operação."
@@ -105,11 +144,21 @@ def tratar_erro_boto3(e: ClientError, operacao: str = None) -> str:
             return "Erro: A instância deve estar **parada** para esta operação."
         else:
             return "Erro: A instância está em estado incorreto para esta operação."
+
+    # Erro de hibernação não suportada
     elif error_code == 'UnsupportedHibernationConfiguration':
         return "Erro: A instância não foi configurada para hibernação."
+
+    # Erro de ID de instância não encontrado
     elif error_code == "InvalidInstanceID.NotFound":
         return "Erro: ID da instância inválido."
+
+    # Erros de permissão
     elif error_code in ['UnauthorizedOperation', 'AccessDenied']:
+        if operacao == 'list':
+            return "Erro: Permissão insuficiente para listar as instâncias."
         return "Erro: Permissão insuficiente para realizar a operação."
+
+    # Outros erros
     else:
         return f"Erro inesperado: {e}"
