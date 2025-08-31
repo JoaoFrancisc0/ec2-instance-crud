@@ -1,16 +1,15 @@
-import boto3
-from botocore.exceptions import ClientError
+from src import ClientError, get_ec2_client
 
 # Inicializa o cliente EC2
-ec2 = boto3.client('ec2')
+ec2 = get_ec2_client()
 
 def criar_instancia(nome):
     try:
         instancia = ec2.run_instances(
-            ImageId='ami-0c94855ba95c71c99', # Substitua pelo seu AMI
+            ImageId='ami-0c94855ba95c71c99',
             MinCount=1,
             MaxCount=1,
-            InstanceType='t2.micro',
+            InstanceType='t3.micro',
             TagSpecifications=[{
                 'ResourceType': 'instance',
                 'Tags': [{'Key': 'Name', 'Value': nome}]
@@ -114,4 +113,3 @@ def tratar_erro_boto3(e: ClientError, operacao: str = None) -> str:
         return "Erro: Permissão insuficiente para realizar a operação."
     else:
         return f"Erro inesperado: {e}"
-
