@@ -5,16 +5,15 @@ def main():
         print("1- Criar nova instância de máquina virtual\n" \
             "2- Listar todas as instâncias de máquinas virtuais\n" \
             "3- Iniciar uma instância de máquina virtual\n" \
-            "4 - Rebootar uma instância de máquina virtual\n" \
-            "5 - Hibernar uma instância de máquina virtual\n" \
+            "4- Rebootar uma instância de máquina virtual\n" \
+            "5- Hibernar uma instância de máquina virtual\n" \
             "6- Parar uma instância de máquina virtual\n" \
             "7- Terminar uma instância de máquina virtual\n" \
             "8- Atualizar uma instância de máquina virtual\n"
             "0- Sair\n")
         escolha = input("Escolha uma opção: ")
         if escolha == "1":
-            nome = input("Nome da instância: ")
-            svc.criar_instancia(nome)
+            svc.criar_instancia()
         elif escolha == "2":
             svc.listar_instancias()
         elif escolha == "3":
