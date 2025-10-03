@@ -4,9 +4,9 @@ from src.service import s3_service
 
 def cli_ec2(ec2):
     while True:
-        print("Escolha uma das opcoes abaixo:")
+        print("\n=== Gerenciamento de EC2 ===")
         print("1 - Criar instância")
-        print("2 - Lista instância")
+        print("2 - Lista instâncias")
         print("3 - Buscar instância por ID")
         print("4 - Atualizar instância")
         print("5 - Deletar instância")
@@ -65,7 +65,10 @@ def cli_ec2(ec2):
                 print("Operação de deleção cancelada.")
         
         elif escolha == "0":
-            return
+            break
+
+        else:
+            print("Opção inválida. Tente novamente.")
 
 
 
@@ -124,7 +127,7 @@ def cli_s3(s3):
                 s3_service.delete_object(s3, bucket_name, object_name)
 
         elif escolha == "0":
-            return
+            break
 
         else:
             print("Opção inválida. Tente novamente.")
@@ -136,7 +139,7 @@ def cli():
 
     print("Ola, bem vindo ao gerenciador de instancias EC2 e S3!")
     while True:
-        print("Escolha uma das opcoes abaixo:")
+        print("\nEscolha uma das opcoes abaixo:")
         print("1 - Utilizar EC2")
         print("2 - Utilizar S3")
         print("0 - Sair")
@@ -147,4 +150,4 @@ def cli():
             cli_s3(s3)
         elif escolha == "0":
             print("Saindo...")
-            return
+            break
