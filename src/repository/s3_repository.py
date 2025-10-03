@@ -7,7 +7,7 @@ def create_bucket(bucket_name):
     try:
         response = s3.create_bucket(
             Bucket=bucket_name,
-            CreateBucketConfiguration={"LocationConstraint": "us-east-1"}
+            # CreateBucketConfiguration={"LocationConstraint": "us-east-1"}
         )
         return response
     except ClientError as e:
