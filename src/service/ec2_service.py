@@ -34,13 +34,10 @@ def add_ec2_instance(ec2, image_id, instance_type, min_count=1, max_count=1, nam
             max_count=max_count,
             name=name
         )
-
         if success:
             print("Instância criada com sucesso!")
-
         else:
             print("Falha ao criar a instância.")
-
     except ClientError as e:
         print(f"Erro inesperado ao criar a instância:\n{e}")
 
@@ -48,10 +45,8 @@ def add_ec2_instance(ec2, image_id, instance_type, min_count=1, max_count=1, nam
 def find_ec2_instance(ec2, instance_id):
     try:
         instance = get_instance(ec2, instance_id)
-
         if instance is None:
             print("Instância não encontrada.")
-        
         else:
             # Pegar o nome da instância via tag 'Name'
             name_tag = "N/A"
@@ -60,7 +55,6 @@ def find_ec2_instance(ec2, instance_id):
                 if tag.get('Key') == 'Name':
                     name_tag = tag.get('Value', "N/A")
                     break
-            
             instance_info = {
                 "Name": name_tag,
                 "InstanceId": instance.get("InstanceId", "N/A"),
@@ -69,7 +63,6 @@ def find_ec2_instance(ec2, instance_id):
                 "AvailabilityZone": instance.get("Placement", {}).get("AvailabilityZone", "N/A"),
                 "PublicIPv4": instance.get("PublicIpAddress", "N/A")
             }
-            
             # Print dos atributos
             print("Nome da instância:", instance_info["Name"])
             print("ID da instância:", instance_info["InstanceId"])
@@ -77,7 +70,6 @@ def find_ec2_instance(ec2, instance_id):
             print("Tipo de instância:", instance_info["InstanceType"])
             print("Zona de disponibilidade:", instance_info["AvailabilityZone"])
             print("IPv4 público:", instance_info["PublicIPv4"])
-        
     except ClientError as e:
         print(f"Erro ao buscar a instância:\n{e}")
 
@@ -89,12 +81,9 @@ def find_all_ec2_instances(ec2, filter=None):
             applied_filter = PREDEFINED_FILTERS.get(filter, None)
         else:
             applied_filter = filter
-
         instances = list_instances(ec2, applied_filter)
-
         if not instances:
             print("Nenhuma instância encontrada com os filtros fornecidos.")
-
         for instance in instances:
             # Pegar o nome da instância via tag 'Name'
             name_tag = "N/A"
@@ -103,7 +92,6 @@ def find_all_ec2_instances(ec2, filter=None):
                 if tag.get('Key') == 'Name':
                     name_tag = tag.get('Value', "N/A")
                     break
-
             info = {
                 "Name": name_tag,
                 "InstanceId": instance.get("InstanceId", "N/A"),
@@ -112,7 +100,6 @@ def find_all_ec2_instances(ec2, filter=None):
                 "AvailabilityZone": instance.get("Placement", {}).get("AvailabilityZone", "N/A"),
                 "PublicIPv4": instance.get("PublicIpAddress", "N/A")
             }
-
             # Print dos atributos
             print("Nome da instância:", info["Name"])
             print("ID da instância:", info["InstanceId"])
@@ -121,7 +108,6 @@ def find_all_ec2_instances(ec2, filter=None):
             print("Zona de disponibilidade:", info["AvailabilityZone"])
             print("DNS/IPv4 público:", info["PublicIPv4"])
             print("-" * 40)
-
     except ClientError as e:
         print(f"Erro ao listar instâncias:\n{e}")
 
@@ -129,10 +115,8 @@ def find_all_ec2_instances(ec2, filter=None):
 def modify_ec2_instance(ec2, instance_id, action):
     try:
         response = update_instance(ec2, instance_id, action)
-
         if response is None:
             print(f"Falha ao executar ação '{action}' na instância.")
-
         # Mensagem amigável de acordo com a ação
         action_messages = {
             "start": "Iniciada",
@@ -140,24 +124,20 @@ def modify_ec2_instance(ec2, instance_id, action):
             "reboot": "Reiniciada"
         }
         message = action_messages.get(action, "Atualizada")
-
         print(f"Instância {message} com sucesso!")
-
     except ValueError as ve:
         print(f"Erro ao executar ação '{action}' na instância:\n{ve}")
-
     except ClientError as e:
         print(f"Erro ao executar ação '{action}' na instância:\n{e}")
+
 
 def terminate_ec2_instance(ec2, instance_id):
     if not instance_id:
         print("Nenhum ID de instância fornecido.")
-
     try:
         result = delete_instance(ec2, instance_id)
         if result:
             print(f"Instância solicitada para término com sucesso.")
-
     except Exception as e:
         # Aqui você pode logar de forma mais detalhada ou notificar outro sistema
         print(f"Erro ao terminar a instância:\n{e}")
