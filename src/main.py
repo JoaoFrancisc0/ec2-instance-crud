@@ -75,14 +75,27 @@ def cli_ec2(ec2):
 def cli_s3(s3):
     while True:
         print("\n=== Gerenciamento de S3 ===")
+        print("1 - Gerenciar Buckets")
+        print("2 - Gerenciar Arquivos")
+
+        escolha = input("Escolha uma opção: ").strip()
+
+        if escolha == "1":
+            cli_bucket(s3)
+
+        elif escolha == "2":
+            cli_files(s3)
+
+        else:
+            break
+
+def cli_bucket(s3):
+    while True:
+        print("\n=== Gerenciamento de Buckets ===")
         print("1 - Criar Bucket")
         print("2 - Listar Buckets")
-        print("3 - Fazer Upload de Arquivo")
-        print("4 - Fazer Download de Arquivo")
-        print("5 - Listar Objetos em um Bucket")
-        print("6 - Deletar Objeto")
-        print("7 - Deletar Bucket")
-        print("0 - Sair")
+        print("3 - Deletar Bucket")
+        print("0 - Voltar")
 
         escolha = input("Escolha uma opção: ").strip()
 
@@ -98,17 +111,41 @@ def cli_s3(s3):
 
         elif escolha == "3":
             bucket_name = input("Digite o nome do bucket: ").strip()
+            confirm = input(f"Tem certeza que deseja deletar o bucket '{bucket_name}'? (y/n): ").strip().lower()
+            if confirm == "y":
+                s3_service.delete_bucket(s3, bucket_name)
+
+        elif escolha == "0":
+            break
+
+        else:
+            print("Opção inválida. Tente novamente.")
+
+
+def cli_files(s3):
+    while True:
+        print("\n=== Gerenciamento de Arquivos ===")
+        print("1 - Fazer Upload de Arquivo")
+        print("2 - Fazer Download de Arquivo")
+        print("3 - Listar Objetos em um Bucket")
+        print("4 - Deletar Objeto")
+        print("0 - Voltar")
+
+        escolha = input("Escolha uma opção: ").strip()
+
+        if escolha == "1":
+            bucket_name = input("Digite o nome do bucket: ").strip()
             file_path = input("Digite o caminho do arquivo local: ").strip()
             object_name = input("Digite o nome do objeto no S3 (ou deixe vazio para usar o nome do arquivo): ").strip() or None
             s3_service.upload_file(s3, bucket_name, file_path, object_name)
 
-        elif escolha == "4":
+        elif escolha == "2":
             bucket_name = input("Digite o nome do bucket: ").strip()
             object_name = input("Digite o nome do objeto no S3: ").strip()
             file_path = input("Digite o caminho de destino local: ").strip()
             s3_service.download_file(s3, bucket_name, object_name, file_path)
 
-        elif escolha == "5":
+        elif escolha == "3":
             bucket_name = input("Digite o nome do bucket: ").strip()
             prefix = input("Digite um prefixo (ou deixe vazio): ").strip() or None
             objects = s3_service.list_objects(s3, bucket_name, prefix)
@@ -119,7 +156,7 @@ def cli_s3(s3):
                 for obj in objects:
                     print(f"- {obj['Key']} ({obj['Size']} bytes)")
 
-        elif escolha == "6":
+        elif escolha == "4":
             bucket_name = input("Digite o nome do bucket: ").strip()
             object_name = input("Digite o nome do objeto: ").strip()
             confirm = input(f"Tem certeza que deseja deletar '{object_name}' de '{bucket_name}'? (y/n): ").strip().lower()
