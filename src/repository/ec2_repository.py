@@ -1,4 +1,3 @@
-import boto3
 from botocore.exceptions import ClientError
 
 def create_instance(ec2, image_id, instance_type, min_count, max_count, name):

@@ -1,4 +1,6 @@
-from src import os, load_dotenv, boto3
+import os
+from dotenv import load_dotenv
+import boto3
 
 def get_ec2_client():
     dotenv_path = os.path.join(os.path.dirname(__file__), "..", "resources", ".env")
